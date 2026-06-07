@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <title>My Tasks — Ashen Paul</title>
+  <meta name="description" content="A client-side To-Do List app by Ashen Paul. Full CRUD, localStorage persistence, and filter views." />
+  <meta name="author" content="Ashen Paul" />
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- Skip link -->
+  <a class="skip-link" href="#main-content">Skip to main content</a>
+
+  <!-- ===== HEADER ===== -->
+  <header class="site-header" role="banner">
+    <div class="container header-inner">
+      <div class="header-left">
+        <span class="logo-mark" aria-hidden="true">AP</span>
+        <div>
+          <p class="header-name">Ashen Paul</p>
+          <p class="header-sub">Task Manager</p>
+        </div>
+      </div>
+      <button class="theme-btn" id="theme-btn" aria-label="Switch to light mode">
+        <!-- Moon -->
+        <svg class="icon-moon" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+        </svg>
+        <!-- Sun -->
+        <svg class="icon-sun" width="18" height="18" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="12" cy="12" r="5"/>
+          <line x1="12" y1="1"  x2="12" y2="3"/>
+          <line x1="12" y1="21" x2="12" y2="23"/>
+          <line x1="4.22" y1="4.22"  x2="5.64" y2="5.64"/>
+          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+          <line x1="1"  y1="12" x2="3"  y2="12"/>
+          <line x1="21" y1="12" x2="23" y2="12"/>
+          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/>
+          <line x1="18.36" y1="5.64"  x2="19.78" y2="4.22"/>
+        </svg>
+      </button>
+    </div>
+  </header>
+
+  <!-- ===== MAIN ===== -->
+  <main id="main-content" tabindex="-1">
+    <div class="container">
+
+      <!-- STATS ROW -->
+      <div class="stats-row" role="region" aria-label="Task statistics">
+        <div class="stat-box">
+          <span class="stat-num" id="stat-total">0</span>
+          <span class="stat-label">Total</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="stat-active">0</span>
+          <span class="stat-label">Active</span>
+        </div>
+        <div class="stat-box">
+          <span class="stat-num" id="stat-done">0</span>
+          <span class="stat-label">Done</span>
+        </div>
+        <!-- Progress bar -->
+        <div class="progress-wrap" aria-label="Completion progress">
+          <div class="progress-track">
+            <div class="progress-fill" id="progress-fill" style="width:0%"></div>
+          </div>
+          <span class="progress-pct" id="progress-pct" aria-live="polite">0%</span>
+        </div>
+      </div>
+
+      <!-- ADD TASK FORM -->
+      <section class="add-section" aria-labelledby="add-heading">
+        <h1 id="add-heading" class="add-heading">
+          What needs to be done?
+        </h1>
+
+        <form id="add-form" class="add-form" novalidate aria-label="Add a new task">
+          <div class="input-row">
+            <label for="task-input" class="sr-only">New task description</label>
+            <input
+              type="text"
+              id="task-input"
+              class="task-input"
+              placeholder="e.g. Review pull request, Write tests..."
+              maxlength="200"
+              autocomplete="off"
+              spellcheck="true"
+              aria-required="true"
+              aria-describedby="input-hint input-err"
+            />
+            <button type="submit" class="btn-add" aria-label="Add task">
+              <svg width="20" height="20" viewBox="0 0 24 24"
+                   fill="none" stroke="currentColor" stroke-width="2.5"
+                   stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+              </svg>
+              Add Task
+            </button>
+          </div>
+
+          <div class="input-meta">
+            <span id="input-hint" class="input-hint">Press Enter or click Add Task</span>
+            <span id="char-counter" class="char-counter" aria-live="polite">0 / 200</span>
+          </div>
+          <span id="input-err" class="input-err" role="alert" aria-live="assertive" hidden></span>
+
+          <!-- Priority selector -->
+          <div class="priority-row" role="group" aria-label="Task priority">
+            <span class="priority-label">Priority:</span>
+            <label class="priority-opt">
+              <input type="radio" name="priority" value="low" checked />
+              <span class="prio-pill prio-low">Low</span>
+            </label>
+            <label class="priority-opt">
+              <input type="radio" name="priority" value="medium" />
+              <span class="prio-pill prio-medium">Medium</span>
+            </label>
+            <label class="priority-opt">
+              <input type="radio" name="priority" value="high" />
+              <span class="prio-pill prio-high">High</span>
+            </label>
+          </div>
+        </form>
+      </section>
+
+      <!-- FILTER + BULK ACTIONS -->
+      <div class="toolbar">
+        <div class="filter-group" role="group" aria-label="Filter tasks">
+          <button class="filter-btn active" data-filter="all"       aria-pressed="true">All</button>
+          <button class="filter-btn"        data-filter="active"    aria-pressed="false">Active</button>
+          <button class="filter-btn"        data-filter="completed" aria-pressed="false">Completed</button>
+        </div>
+        <div class="bulk-actions">
+          <button class="btn-bulk" id="btn-complete-all" aria-label="Mark all tasks complete">
+            Mark all done
+          </button>
+          <button class="btn-bulk btn-danger" id="btn-clear-done" aria-label="Delete all completed tasks">
+            Clear done
+          </button>
+        </div>
+      </div>
+
+      <!-- LIVE REGION: announces filter results and actions -->
+      <p id="live-announce" class="sr-only" aria-live="polite" aria-atomic="true"></p>
+
+      <!-- SEARCH -->
+      <div class="search-wrap">
+        <label for="search-input" class="sr-only">Search tasks</label>
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24"
+             fill="none" stroke="currentColor" stroke-width="2"
+             stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+          <circle cx="11" cy="11" r="8"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+        <input
+          type="search"
+          id="search-input"
+          class="search-input"
+          placeholder="Search tasks..."
+          aria-label="Search tasks"
+          autocomplete="off"
+        />
+      </div>
+
+      <!-- TASK LIST -->
+      <section aria-labelledby="tasks-heading">
+        <h2 id="tasks-heading" class="sr-only">Task list</h2>
+
+        <ul
+          id="task-list"
+          class="task-list"
+          role="list"
+          aria-label="Your tasks"
+          aria-live="polite"
+        ></ul>
+
+        <!-- Empty state -->
+        <div id="empty-state" class="empty-state" hidden>
+          <span class="empty-icon" aria-hidden="true">✓</span>
+          <p class="empty-title">All clear!</p>
+          <p class="empty-sub" id="empty-sub">No tasks here. Add one above.</p>
+        </div>
+      </section>
+
+    </div><!-- /container -->
+  </main>
+
+  <!-- EDIT MODAL -->
+  <div
+    id="edit-modal"
+    class="modal-backdrop"
+    role="dialog"
+    aria-modal="true"
+    aria-labelledby="modal-heading"
+    hidden
+  >
+    <div class="modal">
+      <h2 id="modal-heading">Edit Task</h2>
+      <label for="edit-input" class="field-label">Task description</label>
+      <input
+        type="text"
+        id="edit-input"
+        class="task-input"
+        maxlength="200"
+        aria-required="true"
+        aria-describedby="edit-err"
+      />
+      <span id="edit-err" class="input-err" role="alert" aria-live="assertive" hidden></span>
+
+      <div class="priority-row" role="group" aria-label="Edit task priority">
+        <span class="priority-label">Priority:</span>
+        <label class="priority-opt">
+          <input type="radio" name="edit-priority" value="low" />
+          <span class="prio-pill prio-low">Low</span>
+        </label>
+        <label class="priority-opt">
+          <input type="radio" name="edit-priority" value="medium" />
+          <span class="prio-pill prio-medium">Medium</span>
+        </label>
+        <label class="priority-opt">
+          <input type="radio" name="edit-priority" value="high" />
+          <span class="prio-pill prio-high">High</span>
+        </label>
+      </div>
+
+      <div class="modal-actions">
+        <button class="btn-solid" id="modal-save">Save changes</button>
+        <button class="btn-ghost" id="modal-cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== FOOTER ===== -->
+  <footer class="site-footer" role="contentinfo">
+    <div class="container footer-inner">
+      <p class="footer-copy">
+        &copy; <time datetime="2025">2025</time> Ashen Paul &mdash; Task 3, JavaScript &amp; State Management
+      </p>
+    </div>
+  </footer>
+
+  <script src="app.js"></script>
+</body>
+</html>
